@@ -74,7 +74,7 @@ impl eframe::App for App {
                             println!("Right!");
                         }
                     });
-                })
+                });
             });
     }
 }
