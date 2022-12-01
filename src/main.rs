@@ -2,6 +2,9 @@
 
 use eframe::egui;
 
+mod ui_left;
+use ui_left::FoldedOutLeft;
+
 fn main() {
     let mut options = eframe::NativeOptions::default();
     options.maximized = true;
@@ -14,12 +17,16 @@ fn main() {
 
 struct App {
     bg0: Option<egui::TextureHandle>,
+
+    folded_out_left: FoldedOutLeft,
 }
 
 impl Default for App {
     fn default() -> Self {
         Self {
             bg0: None,
+
+            folded_out_left: FoldedOutLeft::None,
         }
     }
 }
@@ -51,31 +58,79 @@ impl eframe::App for App {
         });
         let draw_size = frame.info().window_info.size;
 
-        egui::Window::new("window")
-            .anchor(egui::Align2::CENTER_TOP, [0.0, draw_size.y / 36.0])
+        let offset = draw_size.y / 56.0;
+
+        egui::Window::new("main_controls")
+            .anchor(egui::Align2::LEFT_TOP, [offset, offset])
             .resizable(false)
-            .fixed_size([draw_size.x / 2.0, draw_size.y / 6.0])
+            .fixed_size([draw_size.x / 5.0, draw_size.y / 32.0])
             .title_bar(false)
             .show(ctx, |ui| {
                 ui.style_mut().visuals.widgets.noninteractive.bg_fill = egui::Color32::TRANSPARENT;
+                ui.style_mut().visuals.widgets.inactive.bg_fill = egui::Color32::TRANSPARENT;
+                ui.style_mut().visuals.widgets.hovered.bg_fill = egui::Color32::TRANSPARENT;
+                ui.style_mut().visuals.widgets.active.bg_fill = egui::Color32::TRANSPARENT;
+                ui.style_mut().visuals.widgets.open.bg_fill = egui::Color32::TRANSPARENT;
                 ui.columns(3, |columns| {
                     columns[0].centered_and_justified(|ui| {
-                        if ui.button("Left").clicked() {
-                            println!("Left!");
+                        if ui.button("Race").clicked() {
+                            if self.folded_out_left != FoldedOutLeft::Race {
+                                self.folded_out_left = FoldedOutLeft::Race;
+                            } else {
+                                self.folded_out_left = FoldedOutLeft::None;
+                            }
                         }
                     });
                     columns[1].centered_and_justified(|ui| {
-                        if ui.button("Play").clicked() {
-                            println!("Pressed!");
+                        if ui.button("Host").clicked() {
+                            println!("Host!");
                         }
                     });
                     columns[2].centered_and_justified(|ui| {
-                        if ui.button("Right").clicked() {
-                            println!("Right!");
+                        if ui.button("Settings").clicked() {
+                            println!("Settings!");
                         }
                     });
                 });
             });
+
+        egui::Window::new("profile_controls")
+            .anchor(egui::Align2::RIGHT_TOP, [-offset, offset])
+            .resizable(false)
+            .fixed_size([draw_size.x / 3.0, draw_size.y / 32.0])
+            .title_bar(false)
+            .show(ctx, |ui| {
+                ui.style_mut().visuals.widgets.noninteractive.bg_fill = egui::Color32::TRANSPARENT;
+                ui.style_mut().visuals.widgets.inactive.bg_fill = egui::Color32::TRANSPARENT;
+                ui.style_mut().visuals.widgets.hovered.bg_fill = egui::Color32::TRANSPARENT;
+                ui.style_mut().visuals.widgets.active.bg_fill = egui::Color32::TRANSPARENT;
+                ui.style_mut().visuals.widgets.open.bg_fill = egui::Color32::TRANSPARENT;
+                ui.columns(5, |columns| {
+                    columns[0].centered_and_justified(|ui| {
+                        ui.label("Pace Rating: 1200");
+                    });
+                    columns[1].centered_and_justified(|ui| {
+                        ui.label("Safety Rating: 1600");
+                    });
+                    columns[2].centered_and_justified(|ui| {
+                        if ui.button("Profile").clicked() {
+                            println!("Profile!");
+                        }
+                    });
+                    columns[3].centered_and_justified(|ui| {
+                        if ui.button("Garage").clicked() {
+                            println!("Garage!");
+                        }
+                    });
+                    columns[4].centered_and_justified(|ui| {
+                        if ui.button("Stats").clicked() {
+                            println!("Settings!");
+                        }
+                    });
+                });
+            });
+
+        self.folded_out_left.draw([offset, offset*2.5 + draw_size.y / 32.0], ctx);
     }
 }
 
